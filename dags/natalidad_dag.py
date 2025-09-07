@@ -69,15 +69,8 @@ def download_indicators_wb(**kwargs):
 #LIMPIA LAS FILAS SIN VALORES
 #VAMOS A PODER FILTRAR POR PAISES ESPECIFICOS O DE TODO EL MUNDO
 def merge_indicators(**kwargs):
-    """
-    Mergea los CSV descargados de cada indicador, limpia filas sin valores,
-    filtra por países específicos y guarda el CSV final.
-    
-    kwargs:
-        paises (list): lista de países a incluir. Si es None, incluye todos.
-    """
-    paises = kwargs.get("paises", None)  # Lista de países a filtrar (opcional)
-
+    #EN EL CASO QUE QUERAMOS FILTRAR POR PAISES (DE MANERA OPCIONAL)
+    paises = kwargs.get("paises", None)
     dfs = []
     for nombre in INDICADORES.keys():
         file_path = os.path.join(DATA_DIR, "raw", f"{nombre}.csv")
@@ -89,10 +82,10 @@ def merge_indicators(**kwargs):
     for df in dfs[1:]:
         df_merged = df_merged.merge(df, on=["Pais", "CodigoPais", "Año"], how="outer")
 
-    # PODEMOS ELIMINAR LAS FILAS QUE NO TENGAN UN VALOR VÁLIDO CON ESTA LINEA DE CODIGO
+    # PODEMOS ELIMINAR LAS FILAS QUE NO TENGAN UN VALOR VÁLIDO CON LA SIGUIENTE LINEA DE CODIGO
     #df_merged = df_merged.dropna(subset=list(INDICADORES.keys()), how="all")
 
-    #PODEMOS FILTRAR POR PAISES SI QUEREMOS O BIEN TODOS LOS PAISES
+    #PODEMOS FILTRAR POR PAISES SI QUEREMOS O BIEN TODOS LOS PAISES PASANDOSELOS COMO PARAMETROS DESDE EL DAG
     if paises:
         df_merged = df_merged[df_merged["Pais"].isin(paises)]
 
